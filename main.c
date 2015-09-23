@@ -2,16 +2,19 @@
 
 void memPrint(){
 	int i = 0;
-	for(; i<13; i++){
-		printf("%d ", mem.input[i]);
-	}
-	printf("\n    ");
-	for(i = 0; i<33; i++){
-		printf("%d ", mem.lpmem[i]);
-	}
-	printf("\n    ");
-	for(i = 0; i<5; i++) {
-		printf("%d ", mem.hpmem[i]);
+//	for(; i<13; i++){
+//		printf("%d ", mem.input[i]);
+//	}
+//	printf("\n    ");
+//	for(i = 0; i<33; i++){
+//		printf("%d ", mem.lpmem[i]);
+//	}
+//	printf("\n    ");
+//	for(i = 0; i<5; i++) {
+//		printf("%d ", mem.hpmem[i]);
+//	}
+	for(; i < 3; i++) {
+		printf("%d ", mem.mwimem[i]);
 	}
 	printf("\n \n");
 }
@@ -31,12 +34,6 @@ int getIndex(int length, int index, int delta) {
 	}
 }
 
-void mainmwi() {
-	mem.mwimem[getIndex(3, mem.index[4]-first, 1)] = mwi(mem.squarredmem, 31);
-	//printf("%d", 1-first);	// se output.
-	mem.index[4] += 1-first;
-}
-
 int update(){
 	if(mem.index[0] >= 13){
 		mem.index[0] = 0;
@@ -47,10 +44,10 @@ int update(){
 	if(mem.index[2] >= 5){
 		mem.index[2] = 0;
 	}
-	if(mem.index[3] >= 31){
+	if(mem.index[3] >= 30){
 		mem.index[3] = 0;
 	}
-	if(mem.index[4] >= 4){
+	if(mem.index[4] >= 3){
 		mem.index[4] = 0;
 	}
 
@@ -99,8 +96,13 @@ void mainderivative() {
 }
 
 void mainsquarred() {
-	mem.squarredmem[getIndex(31, mem.index[3]-first, 1)] = squarring(mem.derivativemem);
+	mem.squarredmem[getIndex(30, mem.index[3]-first, 1)] = squarring(mem.derivativemem);
 	mem.index[3] += 1-first;
+}
+
+void mainmwi() {
+	mem.mwimem[getIndex(3, mem.index[4]-first, 1)] = mwi(mem.squarredmem, 30);
+	mem.index[4] += 1-first;
 }
 
 int main() {
@@ -116,10 +118,12 @@ int main() {
 		mainsquarred();
 		mainmwi();
 
+		printf("%d: ", (i+1));
 //		memPrint();
+		update();
 		printf("%d:    Low-Pass = %i, High-Pass = %i, Derivative = %i, Squarred = %i, MWI = %i\n", (i+1), mem.lpmem[mem.index[1]], mem.hpmem[mem.index[2]], mem.derivativemem, mem.squarredmem[mem.index[3]], mem.mwimem[mem.index[4]]);
 
-		update();
+
 		first = 0;
 	}
 	return 0;

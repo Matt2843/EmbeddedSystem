@@ -17,7 +17,7 @@ struct Memory{
 	int lpmem[33]; 			// Index[1]
 	int hpmem[5]; 			// Index[2]
 	int derivativemem;
-	int squarredmem[31]; 	// Index[3]
+	int squarredmem[30]; 	// Index[3]
 	int mwimem[3]; 			// Index[4]
 } static mem;
 

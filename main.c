@@ -20,38 +20,43 @@ printf("\n \n");
 }
 
 int getIndex(int length, int index, int delta) {
-if(index + delta == length){
-update();
-return 0;
-} else if (index + delta > length) {
-return index + delta - length;
+	if(index + delta == length){
+	update();
+	return 0;
+	} else if (index + delta > length) {
+	return index + delta - length;
 
-} else if (index + delta < 0 ){
-return index + delta + length;
+	} else if (index + delta < 0 ){
+	return index + delta + length;
 
-} else {
-return index + delta;
-}
+	} else {
+	return index + delta;
+	}
 }
 
 int update(){
-if(mem.index[0] >= 13){
-mem.index[0] = 0;
-}
-if(mem.index[1] >= 33){
-mem.index[1] = 0;
-}
-if(mem.index[2] >= 5){
-mem.index[2] = 0;
-}
-if(mem.index[3] >= 30){
-mem.index[3] = 0;
-}
-if(mem.index[4] >= 3){
-mem.index[4] = 0;
-}
-
-return 0;
+	if(mem.index[0] >= 13){
+		mem.index[0] = 0;
+	}
+	if(mem.index[1] >= 33){
+		mem.index[1] = 0;
+	}
+	if(mem.index[2] >= 5){
+		mem.index[2] = 0;
+	}
+	if(mem.index[3] >= 30){
+		mem.index[3] = 0;
+	}
+	if(mem.index[4] >= 3){
+		mem.index[4] = 0;
+	}
+	if(mem.index[7] >= 8) {
+		mem.index[7] = 0;
+	}
+	if(mem.index[8] >= 8) {
+		mem.index[8] = 0;
+	}
+	return 0;
 }
 
 void maininput() {
@@ -107,7 +112,7 @@ void mainmwi() {
 
 void peakRRTrue() {
 	peakmem.rpeaks[mem.index[6]] = peakmem.peaks[mem.index[5]];
-	peakmem.RecentRR[mem.index[8]] = peakmem.RR_COUNTER;
+	peakmem.RecentRR[getIndex(8, mem.index[8], 1)] = peakmem.RR_COUNTER;
 	peakmem.RR_AVERAGE1 = RR_AVERAGE1(peakmem.RecentRR);
 	peakmem.RR_LOW = RR_LOW(peakmem.RR_AVERAGE2);
 	peakmem.RR_HIGH = RR_HIGH(peakmem.RR_AVERAGE2);
@@ -129,7 +134,7 @@ void peaksbullshit() {
 			if(peakmem.RR_COUNTER > peakmem.RR_LOW && peakmem.RR_COUNTER < peakmem.RR_HIGH) {
 				to++;
 				peakmem.SPKF = evaluateSPKF(peakmem.peaks[mem.index[5]-1], peakmem.SPKF);
-				peakmem.RecentRR_OK[mem.index[7]] = peakmem.RR_COUNTER;
+				peakmem.RecentRR_OK[getIndex(8, mem.index[7], 1)] = peakmem.RR_COUNTER;
 				mem.index[7]++;
 				peakmem.RR_AVERAGE2 = RR_AVERAGE2(peakmem.RecentRR_OK);
 				peakRRTrue();
@@ -164,7 +169,7 @@ int main() {
 	file = fopen(filename, "r");
 	first = 1; peakmem.SPKF = 10; peakmem.NPKF = 10; peakmem.RR_COUNTER = 0;
 	peakmem.THRESHOLD1 = 7000; peakmem.RR_LOW = 0; peakmem.RR_HIGH = 7000;
-	et = 0; to = 0; tre = 0; fire = 0; fem = 0;
+	et = 0; to = 0; tre = 0; fire = 0; fem = 0; mem.index[8] = -1; mem.index[7] = -1;
 
 	int i = 0;
 	for (i = 0; i < 10000; i++) {
@@ -177,11 +182,11 @@ int main() {
 
 		//		printf("%d: ", (i+1));
 		//		memPrint();
-		update();
+
 		//		printf("%d:    Low-Pass = %i, High-Pass = %i, Derivative = %i, Squarred = %i, MWI = %i\n", (i+1), mem.lpmem[mem.index[1]], mem.hpmem[mem.index[2]], mem.derivativemem, mem.squarredmem[mem.index[3]], mem.mwimem[mem.index[4]]);
 
 		peaksbullshit();
-
+		update();
 
 //		printf("%d: %d\n", i, peakmem.rpeaks[mem.index[6]-1]);
 

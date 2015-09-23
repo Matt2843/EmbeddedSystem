@@ -10,6 +10,8 @@
 #include "mwi.h"
 #include "squarring.h"
 
+// HEJ LISE!!!!
+
 // Memory Structures
 struct Memory{
 	int index[6];

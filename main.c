@@ -123,42 +123,47 @@ void peaksbullshit() {
 
 	if (peakmem.peaks[mem.index[5]] != 0) {
 		mem.index[5]++;
+		if (peakmem.peaks[mem.index[5]-1] > peakmem.THRESHOLD1) {
+		//	printf("%d ", peakmem.THRESHOLD1);
+			et++;
+			if(peakmem.RR_COUNTER > peakmem.RR_LOW && peakmem.RR_COUNTER < peakmem.RR_HIGH) {
+				to++;
+				peakmem.SPKF = evaluateSPKF(peakmem.peaks[mem.index[5]-1], peakmem.SPKF);
+				peakmem.RecentRR_OK[mem.index[7]] = peakmem.RR_COUNTER;
+				mem.index[7]++;
+				peakmem.RR_AVERAGE2 = RR_AVERAGE2(peakmem.RecentRR_OK);
+				peakRRTrue();
+			} else if (peakmem.RR_COUNTER > peakmem.RR_MISS) {
+				tre++;
+				int j = 0;
+				while(peakmem.peaks[mem.index[5] - j] <= peakmem.THRESHOLD2){
+					fire++;
+					j++;
+				}
+				peakmem.RR_COUNTER -= j;
+				peakmem.rpeaks[mem.index[6]] = peakmem.peaks[mem.index[5]-j];
+				mem.index[6]++;
+				peakmem.SPKF = evaluateSPKF2(peakmem.peaks[mem.index[5]], peakmem.SPKF);
+				peakRRTrue();
+			}
+			peakmem.RR_COUNTER = 0;
+		} else {
+			fem++;
+			peakmem.NPKF = evaluateNPKF(peakmem.peaks[mem.index[5]], peakmem.NPKF);
+			peakmem.THRESHOLD1 = evaluateTHRESHOLD1(peakmem.NPKF, peakmem.SPKF);
+			peakmem.THRESHOLD2 = evaluateTHRESHOLD2(peakmem.THRESHOLD1);
+			peakmem.RR_COUNTER++;
+		}
 	}
 
-	if (peakmem.peaks[mem.index[5]-1] > peakmem.THRESHOLD1) {
-		et++;
-		if(peakmem.RR_COUNTER > peakmem.RR_LOW && peakmem.RR_COUNTER < peakmem.RR_HIGH) {
-			to++;
-			peakmem.SPKF = evaluateSPKF(peakmem.peaks[mem.index[5]], peakmem.SPKF);
-			peakmem.RecentRR_OK[mem.index[7]] = peakmem.RR_COUNTER;
-			mem.index[7]++;
-			peakmem.RR_AVERAGE2 = RR_AVERAGE2(peakmem.RecentRR_OK);
-			peakRRTrue();
-		} else if (peakmem.RR_COUNTER > peakmem.RR_MISS) {
-			tre++;
-			int j = 0;
-			while(!peakmem.peaks[mem.index[5]] - j > peakmem.THRESHOLD2){
-				fire++;
-				peakmem.SPKF = evaluateSPKF2(peakmem.peaks[mem.index[5]], peakmem.SPKF);
-				j++;
-			}
-			peakmem.RR_COUNTER -= j;
-			peakRRTrue();
-		}
-		peakmem.RR_COUNTER = 0;
-	} else {
-		fem++;
-		peakmem.NPKF = evaluateNPKF(peakmem.peaks[mem.index[5]], peakmem.NPKF);
-		peakmem.THRESHOLD1 = evaluateTHRESHOLD1(peakmem.NPKF, peakmem.SPKF);
-		peakmem.THRESHOLD2 = evaluateTHRESHOLD2(peakmem.THRESHOLD1);
-		peakmem.RR_COUNTER++;
-	}
 }
+
+
 
 int main() {
 	file = fopen(filename, "r");
-	first = 1; peakmem.SPKF = 100; peakmem.NPKF = 100; peakmem.RR_COUNTER = 0;
-	peakmem.THRESHOLD1 = 0; peakmem.RR_LOW = 1; peakmem.RR_HIGH = 200;
+	first = 1; peakmem.SPKF = 10; peakmem.NPKF = 10; peakmem.RR_COUNTER = 0;
+	peakmem.THRESHOLD1 = 7000; peakmem.RR_LOW = 0; peakmem.RR_HIGH = 7000;
 	et = 0; to = 0; tre = 0; fire = 0; fem = 0;
 
 	int i = 0;

@@ -9,16 +9,21 @@
 #define PEAKS_H_
 
 // Functions
-int findPeak(int *processedData) {
-	if(processedData[1] > processedData[2] && processedData[1] > processedData[0]) {
-		return processedData[1];
+int findPeak(int left, int mid, int right) {
+	if(mid > left && mid > right) {
+//		printf("%d\n", mid);
+		return mid;
 	} else {
-		return -1;
+		return 0;
 	}
 }
 
 int evaluateSPKF(int peak, int SPKF) {
 	return 0.125*peak+0.875*SPKF;
+}
+
+int evaluateSPKF2(int peak, int SPKF) {
+	return 0.25*peak+0.75*SPKF;
 }
 
 int evaluateNPKF(int peak, int NPKF) {
@@ -29,7 +34,7 @@ int evaluateTHRESHOLD1(int NPKF, int SPKF) {
 	return NPKF+0.25*(SPKF-NPKF);
 }
 
-int evaluateHTRESHOLD2(int THRESHOLD1) {
+int evaluateTHRESHOLD2(int THRESHOLD1) {
 	return 0.5*THRESHOLD1;
 }
 

@@ -19,23 +19,28 @@ int findPeak(int left, int mid, int right) {
 }
 
 int evaluateSPKF(int peak, int SPKF) {
+	printf("SPKF = %d\n",0.125*peak+0.875*SPKF);
 	return 0.125*peak+0.875*SPKF;
 }
 
 int evaluateSPKF2(int peak, int SPKF) {
+	printf("SPKF2 = %d\n",0.25*peak+0.75*SPKF);
 	return 0.25*peak+0.75*SPKF;
 }
 
 int evaluateNPKF(int peak, int NPKF) {
+	printf("NPKF = %d\n",0.125*peak+0.875*NPKF);
 	return 0.125*peak+0.875*NPKF;
 }
 
 int evaluateTHRESHOLD1(int NPKF, int SPKF) {
+	printf("TH1 = %d\n", NPKF+0.25*(SPKF-NPKF));
 	return NPKF+0.25*(SPKF-NPKF);
 }
 
 int evaluateTHRESHOLD2(int THRESHOLD1) {
-	return 0.5*THRESHOLD1;
+	printf("TH2 = %d \n", THRESHOLD1/2);
+	return THRESHOLD1/2;
 }
 
 int RR_AVERAGE1(int *rr_intervals) {
@@ -44,6 +49,7 @@ int RR_AVERAGE1(int *rr_intervals) {
 	for (; i < 8; i++) {
 		result += rr_intervals[i];
 	}
+	printf("AVE1 = %d \n", result/8);
 	return result / 8;
 }
 
@@ -53,18 +59,22 @@ int RR_AVERAGE2(int *rr_intervals2) {
 	for (; i < 8; i++) {
 		result += rr_intervals2[i];
 	}
+	printf("AVE2 = %d \n", result/8);
 	return result / 8;
 }
 
 int RR_LOW(int RR_AVERAGE2) {
+	printf("Low = %d\n", 0.92*RR_AVERAGE2);
 	return 0.92*RR_AVERAGE2;
 }
 
 int RR_HIGH(int RR_AVERAGE2) {
+	printf("high = %d\n", 1.16*RR_AVERAGE2);
 	return 1.16*RR_AVERAGE2;
 }
 
 int RR_MISS(int RR_AVERAGE2) {
+	printf("Miss = %d\n", 1.66*RR_AVERAGE2);
 	return 1.66*RR_AVERAGE2;
 }
 

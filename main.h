@@ -38,8 +38,8 @@ struct PeakMemory{
 	int RR_HIGH;
 	int RR_MISS;
 	int RR_COUNTER;
-	int RecentRR_OK[8];	// Index[7]
-	int RecentRR[8]; // Index[8]
+	int RecentRR_OK[8];		// Index[7]
+	int RecentRR[8]; 		// Index[8]
 } static peakmem;
 
 // Data

@@ -10,7 +10,7 @@
 
 // Functions
 int findPeak(int left, int mid, int right) {
-	if(mid > left && mid > right) {
+	if(mid >= left && mid > right) {
 		//printf("%d\n", mid);
 		return mid;
 	} else {
@@ -43,24 +43,20 @@ int evaluateTHRESHOLD2(int THRESHOLD1) {
 	return THRESHOLD1/2;
 }
 
-int RR_AVERAGE1(int *rr_intervals) {
+int RR_AVERAGE(int *rr_intervals) {
 	int i = 0;
 	int result = 0;
 	for (; i < 8; i++) {
+		if(rr_intervals[i] == 0){
+			break;
+		}
 		result += rr_intervals[i];
 	}
-	//printf("AVE1 = %d \n", result/8);
-	return result / 8;
-}
-
-int RR_AVERAGE2(int *rr_intervals2) {
-	int i = 0;
-	int result = 0;
-	for (; i < 8; i++) {
-		result += rr_intervals2[i];
+	//printf("AVE = %d, i = %d \n", result/8);
+	if(i==0){
+		return 0;
 	}
-	//printf("AVE2 = %d \n", result/8);
-	return result / 8;
+	return result / i;
 }
 
 int RR_LOW(int RR_AVERAGE) {

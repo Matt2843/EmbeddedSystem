@@ -13,10 +13,21 @@ void memPrint(){
 //	for(i = 0; i<5; i++) {
 //		printf("%d ", mem.hpmem[i]);
 //	}
-	for(; i < 3; i++) {
-		printf("%d ", mem.mwimem[i]);
+	for(; i < 208; i++) {
+		if(peakmem.peaks[i] == 0){
+			break;
+		}
+			printf("%d ", peakmem.peaks[i]);
+		}
+	i = 0;
+	printf("\n");
+	for(; i < 100; i++) {
+		if(peakmem.rpeaks[i] == 0){
+			break;
+		}
+		printf("%d ", peakmem.rpeaks[i]);
 	}
-		printf("\n \n");
+		//printf("\n \n");
 }
 
 int getIndex(int length, int index, int delta) {
@@ -110,29 +121,36 @@ void mainmwi() {
 void normalRPeakFound(){
 	peakmem.rpeaks[mem.index[6]] = peakmem.peaks[mem.index[5]-1];
 	peakmem.SPKF = evaluateSPKF(peakmem.peaks[mem.index[5]-1], peakmem.SPKF);
-	peakmem.RecentRR_OK[getIndex(8, mem.index[7], 1)] = peakmem.RR_COUNTER;
-	peakmem.RecentRR[getIndex(8, mem.index[8], 1)] = peakmem.RR_COUNTER;
-	peakmem.RR_AVERAGE2 = RR_AVERAGE2(peakmem.RecentRR_OK);
-	peakmem.RR_AVERAGE1 = RR_AVERAGE1(peakmem.RecentRR);
+	if(peakmem.RR_COUNTER > 50){
+		peakmem.RecentRR_OK[getIndex(8, mem.index[7], 1)] = peakmem.RR_COUNTER;
+		mem.index[7]++;
+	}
+		peakmem.RecentRR[getIndex(8, mem.index[8], 1)] = peakmem.RR_COUNTER;
+	mem.index[8]++;
+	peakmem.RR_AVERAGE2 = RR_AVERAGE(peakmem.RecentRR_OK);
+	peakmem.RR_AVERAGE1 = RR_AVERAGE(peakmem.RecentRR);
 	peakmem.RR_LOW = RR_LOW(peakmem.RR_AVERAGE2);
 	peakmem.RR_HIGH = RR_HIGH(peakmem.RR_AVERAGE2);
 	peakmem.RR_MISS = RR_MISS(peakmem.RR_AVERAGE2);
 	peakmem.THRESHOLD1 = evaluateTHRESHOLD1(peakmem.NPKF, peakmem.SPKF);
 	peakmem.THRESHOLD2 = evaluateTHRESHOLD2(peakmem.THRESHOLD1);
-	mem.index[6]++; mem.index[7]++; mem.index[8]++;
+	mem.index[6]++;
 }
 
 void afterSearchBack(int j){
 	peakmem.rpeaks[mem.index[6]] = peakmem.peaks[mem.index[5]-j];
-	peakmem.SPKF = evaluateSPKF2(peakmem.peaks[mem.index[5]-1], peakmem.SPKF);
-	peakmem.RecentRR[getIndex(8, mem.index[8], 1)] = peakmem.RR_COUNTER;
-	peakmem.RR_AVERAGE1 = RR_AVERAGE1(peakmem.RecentRR);
+	peakmem.SPKF = evaluateSPKF2(peakmem.rpeaks[mem.index[6]], peakmem.SPKF);
+	if(peakmem.RR_COUNTER-j > 50){
+		peakmem.RecentRR[getIndex(8, mem.index[8], 1)] = peakmem.RR_COUNTER-j;
+		mem.index[8]++;
+	}
+	peakmem.RR_AVERAGE1 = RR_AVERAGE(peakmem.RecentRR);
 	peakmem.RR_LOW = RR_LOW(peakmem.RR_AVERAGE1);
 	peakmem.RR_HIGH = RR_HIGH(peakmem.RR_AVERAGE1);
 	peakmem.RR_MISS = RR_MISS(peakmem.RR_AVERAGE1);
 	peakmem.THRESHOLD1 = evaluateTHRESHOLD1(peakmem.NPKF, peakmem.SPKF);
 	peakmem.THRESHOLD2 = evaluateTHRESHOLD2(peakmem.THRESHOLD1);
-	mem.index[6]++; mem.index[8]++;
+	mem.index[6]++;
 }
 
 
@@ -143,7 +161,12 @@ void peaksbullshit(int i) {
 
 	if (peakmem.peaks[mem.index[5]] != 0) {
 		mem.index[5]++;
+		if(peakmem.RR_COUNTER > peakmem.RR_MISS){
+			printf("%d < %d < %d < %d\n", peakmem.RR_LOW, peakmem.RR_COUNTER, peakmem.RR_HIGH, peakmem.RR_MISS);
+		}
+
 		if (peakmem.peaks[mem.index[5]-1] > peakmem.THRESHOLD1) {
+			//printf("%d > %d\n", peakmem.peaks[mem.index[5]-1], peakmem.THRESHOLD1);
 			//printf("%d %d\n", i, peakmem.peaks[mem.index[5]-1]);
 			//printf("%d < %d < %d\n", peakmem.THRESHOLD2, peakmem.peaks[mem.index[5]-1], peakmem.THRESHOLD1);
 			//printf("%d < %d < %d\n", peakmem.RR_LOW, peakmem.RR_COUNTER, peakmem.RR_HIGH);
@@ -151,6 +174,7 @@ void peaksbullshit(int i) {
 			if(peakmem.RR_COUNTER > peakmem.RR_LOW && peakmem.RR_COUNTER < peakmem.RR_HIGH) {
 				to++;
 				normalRPeakFound();
+				peakmem.RR_COUNTER = 0;
 			} else if (peakmem.RR_COUNTER > peakmem.RR_MISS) {
 				tre++;
 				int j = 0;
@@ -160,11 +184,13 @@ void peaksbullshit(int i) {
 				while(peakmem.peaks[mem.index[5] - j] <= peakmem.THRESHOLD2){
 					j++;
 				}
-				peakmem.RR_COUNTER -= j;
+				//peakmem.RR_COUNTER -= j;
 				//printf("\n%d", peakmem.RR_COUNTER);
 				afterSearchBack(j);
+				peakmem.RR_COUNTER = 0;
 			}
-			peakmem.RR_COUNTER = 0;
+
+
 		} else {
 			fem++;
 			peakmem.NPKF = evaluateNPKF(peakmem.peaks[mem.index[5]], peakmem.NPKF);
@@ -177,14 +203,17 @@ void peaksbullshit(int i) {
 
 int main() {
 	file = fopen(filename, "r");
-	first = 1; peakmem.SPKF = 1; peakmem.NPKF = 1; peakmem.RR_COUNTER = 0;
-	peakmem.THRESHOLD1 = 4000; peakmem.THRESHOLD2 = 2000; peakmem.RR_LOW = 100; peakmem.RR_HIGH = 200;
+	first = 1; peakmem.SPKF = 1000; peakmem.NPKF = 1000; peakmem.RR_COUNTER = 0;
+	peakmem.THRESHOLD1 = 1000; peakmem.THRESHOLD2 = 500; peakmem.RR_LOW = 100; peakmem.RR_HIGH = 200;
 	et = 0; to = 0; tre = 0; fire = 0; fem = 0; mem.index[7] = -1; mem.index[8] = -1;
 
 	//printf("RR_LOW < RR < RR_HIGH\n");
 
 	int i = 0;
-	for (i = 0; i < 10000; i++) {
+
+	int iterations = 10000;
+
+	for (i = 0; i < iterations; i++) {
 		maininput();
 		mainlowpass();
 		mainhighpass();
@@ -193,7 +222,7 @@ int main() {
 		mainmwi();
 
 		//		printf("%d: ", (i+1));
-		//		memPrint();
+
 
 		//		printf("%d:    Low-Pass = %i, High-Pass = %i, Derivative = %i, Squarred = %i, MWI = %i\n", (i+1), mem.lpmem[mem.index[1]], mem.hpmem[mem.index[2]], mem.derivativemem, mem.squarredmem[mem.index[3]], mem.mwimem[mem.index[4]]);
 
@@ -204,6 +233,7 @@ int main() {
 
 		first = 0;
 	}
-	printf("Et = %d To = %d Tre = %d Fire = %d Fem = %d\n", et, to, tre, fire, fem);
+	//memPrint();
+	printf("\nEt = %d To = %d Tre = %d Fire = %d Fem = %d iterations = %d\n", et, to, tre, fire, fem, iterations-et-to-tre-fire-fem);
 	return 0;
 }

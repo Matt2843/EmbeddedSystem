@@ -180,6 +180,7 @@ void peaksbullshit(int i, int peak, int counter) {
 			if(peakmem.RR_COUNTER > peakmem.RR_LOW && peakmem.RR_COUNTER < peakmem.RR_HIGH) {
 				to++;
 				normalRPeakFound();
+				printf("%d ", 60 * 200/(peakmem.RR_AVERAGE1));
 				peakmem.RR_COUNTER = 0;
 				bool = 0;
 			} else if (peakmem.RR_COUNTER > peakmem.RR_MISS) {
@@ -195,6 +196,8 @@ void peaksbullshit(int i, int peak, int counter) {
 //				printf("\n%d", peakmem.RR_COUNTER);
 				afterSearchBack(j);
 //				peaksbullshit(i, peakmem.peaks[mem.index[5]-1], j);
+				printf("%d ", 60 * 200/(peakmem.RR_AVERAGE1));
+				//peaksbullshit(i, peakmem.peaks[mem.index[5]-1], j);
 				peakmem.RR_COUNTER = 0;
 				bool = 0;
 			}
@@ -205,7 +208,10 @@ void peaksbullshit(int i, int peak, int counter) {
 			peakmem.NPKF = evaluateNPKF(peakmem.peaks[mem.index[5]], peakmem.NPKF);
 			peakmem.THRESHOLD1 = evaluateTHRESHOLD1(peakmem.NPKF, peakmem.SPKF);
 			peakmem.THRESHOLD2 = evaluateTHRESHOLD2(peakmem.THRESHOLD1);
+			printf("%d ", 0);
 		}
+	} else {
+		printf("%d ", 0);
 	}
 }
 
@@ -242,6 +248,8 @@ int main() {
 
 		peaksbullshit(i-1, 0, 0);
 //		printf("%d ", peakmem.THRESHOLD2);
+//		printf("%d ", peakmem.THRESHOLD2);
+
 		update();
 
 //		printf("%d: %d\n", i, peakmem.rpeaks[mem.index[6]-1]);

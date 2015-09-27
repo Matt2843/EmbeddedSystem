@@ -45,8 +45,9 @@ int et, to, tre, fire, fem;
 int bool;
 
 // Function prototypes
-int getIndex(int,int,int);
+void printBullshit(int);
 void memPrint();
+int getIndex(int,int,int);
 int update();
 
 #endif

@@ -4,14 +4,8 @@
 #include <stdio.h>
 
 #include "sensor.h"
-#include "derivative.h"
-#include "highpass.h"
-#include "lowpass.h"
-#include "mwi.h"
-#include "squarring.h"
+#include "filter.h"
 #include "peaks.h"
-
-// HEJ LISE!!!!
 
 // Memory Structures
 struct Memory{

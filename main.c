@@ -209,6 +209,14 @@ void peaksbullshit(int i, int peak, int counter) {
 	}
 }
 
+void printBullshit(int TIME, int PULSE, int type) {
+	char wmsg[] = "WARNING";
+	char lmsg[] = "LOG";
+	printf("===================================================================\n");
+	printf("[%s] LAST RPEAK DETECTECTED: VALUE: %d TIME: %d PULSE: %d\n", type > 0 ? wmsg : lmsg, peakmem.rpeaks[mem.index[6]-1], TIME, 60*200/peakmem.RR_AVERAGE1);
+	printf("===================================================================\n");
+}
+
 int main() {
 	file = fopen(filename, "r");
 	first = 1; peakmem.SPKF = 500; peakmem.NPKF = 500; peakmem.RR_COUNTER = 0;
@@ -233,7 +241,7 @@ int main() {
 //		printf("%d:    Low-Pass = %i, High-Pass = %i, Derivative = %i, Squarred = %i, MWI = %i\n", (i+1), mem.lpmem[mem.index[1]], mem.hpmem[mem.index[2]], mem.derivativemem, mem.squarredmem[mem.index[3]], mem.mwimem[mem.index[4]]);
 
 		peaksbullshit(i-1, 0, 0);
-		printf("%d ", peakmem.THRESHOLD2);
+//		printf("%d ", peakmem.THRESHOLD2);
 		update();
 
 //		printf("%d: %d\n", i, peakmem.rpeaks[mem.index[6]-1]);
@@ -241,6 +249,7 @@ int main() {
 		first = 0;
 	}
 //	memPrint();
+	printBullshit(10,5,1);
 	printf("\nEt = %d To = %d Tre = %d Fire = %d Fem = %d iterations = %d rPeak = %d\n", et, to, tre, fire, fem, iterations-et-to-tre-fire-fem, mem.index[6]);
 	return 0;
 }

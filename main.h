@@ -48,6 +48,7 @@ FILE *file;
 int data;
 int first;
 int et, to, tre, fire, fem;
+int bool;
 
 // Function prototypes
 int getIndex(int,int,int);

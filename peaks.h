@@ -40,7 +40,7 @@ int evaluateTHRESHOLD1(int NPKF, int SPKF) {
 
 int evaluateTHRESHOLD2(int THRESHOLD1) {
 	//printf("TH2 = %d \n", THRESHOLD1/2);
-	return THRESHOLD1/2;
+	return 0.5*THRESHOLD1;
 }
 
 int RR_AVERAGE(int *rr_intervals) {

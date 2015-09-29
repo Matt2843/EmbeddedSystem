@@ -9,7 +9,7 @@ void startTimeAnalysis() {
 
 void stopTimeAnalysis() {
 	end = clock();
-	cpu_time_used = (end-start)/CLOCKS_PER_SEC;
+	cpu_time_used = 1000.0*(end-start)/CLOCKS_PER_SEC;
 	printf("%.5lf\n", cpu_time_used);
 }
 
@@ -157,7 +157,7 @@ void afterSearchBack(int j){
 
 
 void peaksbullshit(int i, int recursive) {
-	int TIME, PULSE, type;
+	int TIME, PEAK, TYPE = 0, prbool = 0;
 
 
 	if(recursive == 0){
@@ -180,7 +180,10 @@ void peaksbullshit(int i, int recursive) {
 
 		if (peakmem.peaks[mem.index[5]-1] > peakmem.THRESHOLD1 && bool /*&& peakmem.peaks[mem.index[5]-1] > 3500*/) {
 			if(peakmem.peaks[mem.index[5]-1] < 2000) {
-				//printBullshit()
+				TIME = peakmem.RR_COUNTER;
+				PEAK = peakmem.rpeaks[mem.index[6]-1];
+				TYPE = 2;
+				prbool = 1;
 			}
 			et++;
 			if(recursive == 1){
@@ -192,22 +195,27 @@ void peaksbullshit(int i, int recursive) {
 				to++;
 				normalRPeakFound();
 //				printBullshit(peakmem.RR_COUNTER, peakmem.rpeaks[mem.index[6]-1], 0, i);
+				TIME = peakmem.RR_COUNTER;
+				PEAK = peakmem.rpeaks[mem.index[6]-1];
+				prbool = 1;
+
 				peakmem.RR_COUNTER = 0;
 				bool = 0;
 			} else if (peakmem.RR_COUNTER > peakmem.RR_MISS) {
 				tre++;
 				int j = 2;
-				printf("%f\n", i*0.005);
+				//printf("%f\n", i*0.005);
 				while(peakmem.peaks[mem.index[5] - j] <= peakmem.THRESHOLD2){
 					j++;
 				}
 				afterSearchBack(j);
 				peakmem.RR_WARNING_COUNTER++;
 				if(peakmem.RR_WARNING_COUNTER >= 5){
-					printBullshit(peakmem.RR_COUNTER-j, peakmem.rpeaks[mem.index[6]-1], 1, i);
-				} else {
-					printBullshit(peakmem.RR_COUNTER-j, peakmem.rpeaks[mem.index[6]-1], 0, i);
+					TYPE = 1;
 				}
+				TIME = peakmem.RR_COUNTER-j;
+				PEAK = peakmem.rpeaks[mem.index[6]-1];
+				prbool = 1;
 				peakmem.RR_COUNTER = j;
 				//mem.index[5]--;
 				peaksbullshit(i, 1);
@@ -225,17 +233,24 @@ void peaksbullshit(int i, int recursive) {
 		}
 	} else {
 	}
+	if(prbool){
+		printBullshit(TIME, PEAK, TYPE, i);
+	}
 }
 
-void printBullshit(int TIME, int PULSE, int type, int i) {
-	char wmsg[] = "WARNING";
-	char lmsg[] = "LOG";
-	int bool = 0;
-	// if(bool){
+void printBullshit(int TIME, int PEAK, int TYPE, int i) {
+	int bool = 1;
+	if(bool){
 		printf("\n====================================================================================\n");
-		printf("[%s] LAST RPEAK DETECTECTED: VALUE: %d TIME: %.3lf PULSE: %d sysTime: %f\n", type > 0 ? wmsg : lmsg, peakmem.rpeaks[mem.index[6]-1], TIME*0.005, 60*200/peakmem.RR_AVERAGE1, i*0.005);
-		printf("====================================================================================\n");
-	// }
+		if(TYPE == 1){
+			printf("[WARNING] UNREGULAR HEART RYTHEM: VALUE: %d TIME: %.3lf PULSE: %d sysTime: %f", PEAK, TIME*0.005, 60*200/peakmem.RR_AVERAGE1, i*0.005);
+		} else if(TYPE == 2) {
+			printf("[WARNING] R-PEAK VALUE BELOW 2000: VALUE: %d TIME: %.3lf PULSE: %d sysTime: %f", PEAK, TIME*0.005, 60*200/peakmem.RR_AVERAGE1, i*0.005);
+		} else {
+			printf("[LOG] LAST RPEAK DETECTECTED: VALUE: %d TIME: %.3lf PULSE: %d sysTime: %f", PEAK, TIME*0.005, 60*200/peakmem.RR_AVERAGE1, i*0.005);
+		}
+		printf("\n====================================================================================\n");
+	}
 }
 
 int main() {
@@ -248,20 +263,17 @@ int main() {
 
 	int i = 0;
 
-	int iterations = 5000;
+	int iterations = 10000;
 
-	int j = 2;
+	int j = 1;
 
 	//for (; j < 101; j++){
 	
+	startTimeAnalysis();
+
 	for (i = 0; i < iterations*j; i++) {
 		ecgScanner();
-		int kk = 0;
-		startTimeAnalysis();
-// 		for (; kk < 1000; kk++) {	
-// //			printf("asfk");
-// 		}
- 		stopTimeAnalysis();
+
 		filters();
 		
 
@@ -271,12 +283,17 @@ int main() {
 //		printf("%d ", peakmem.THRESHOLD2);
 //		printf("%d ", peakmem.THRESHOLD2);
 
+
+
 		update();
 
 //		printf("%d: %d\n", i, peakmem.rpeaks[mem.index[6]-1]);
 
 		first = 0;
 	}
+
+	stopTimeAnalysis();
+
 	//memPrint();
 //	printBullshit(10,5,1,400);	
 	printf("\nEt = %d To = %d Tre = %d Fire = %d Fem = %d iterations = %d rPeak = %d\n", et, to, tre, fire, fem, iterations*j-et-to-tre-fire-fem, mem.index[6]);

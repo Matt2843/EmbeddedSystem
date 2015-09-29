@@ -3,6 +3,16 @@
 // 31 normal peaks in the first 5000 samples
 // 50 shallow fast peaks in the last 5000 samples
 
+void startTimeAnalysis() {
+	start = clock();
+}
+
+void stopTimeAnalysis() {
+	end = clock();
+	cpu_time_used = ((double)end)-start/CLOCKS_PER_SEC;
+	printf("%.5lf\n", cpu_time_used);
+}
+
 void memPrint(){
 	int i = 0;
 //	for(; i<13; i++){
@@ -78,7 +88,8 @@ void maininput() {
 	mem.index[0] += 1-first;
 }
 
-void mainlowpass() {
+int filters() {
+	// LOW-PASS FILTER
 	mem.lpmem[getIndex(33, mem.index[1]-first, 1)] = lowpass(mem.input[getIndex(13, mem.index[0], 0)],
 															 mem.input[getIndex(13, mem.index[0], -6)],
 															 mem.input[getIndex(13, mem.index[0], -12)],
@@ -86,38 +97,25 @@ void mainlowpass() {
 															 mem.lpmem[getIndex(33, mem.index[1], -1)]);
 
 	mem.index[1] += 1-first;
-}
-
-void mainhighpass() {
+	// HIGH-PASS FILTER
 	mem.hpmem[getIndex(5, mem.index[2]-first, 1)] = highpass(mem.lpmem[getIndex(33, mem.index[1], 0)],
 															 mem.lpmem[getIndex(33, mem.index[1], -16)],
 															 mem.lpmem[getIndex(33, mem.index[1], -17)],
 															 mem.lpmem[getIndex(33, mem.index[1], -32)],
 															 mem.hpmem[getIndex(5, mem.index[2], 0)]);
-
-//	printf("%d:    x = %d, x-16 = %d, x-17 = %d, x-32 = %d, y-1 = %d     HIGH PASS RESULT: %d\n", count, mem.lpmem[getIndex(33, mem.index[1], 0)], mem.lpmem[getIndex(33, mem.index[1], -16)], mem.lpmem[getIndex(33, mem.index[1], -17)], mem.lpmem[getIndex(33, mem.index[1], -32)], mem.hpmem[getIndex(5, mem.index[2], 0)], mem.hpmem[getIndex(5, mem.index[2]-mem.first[2], 1)]);
-//	printf("%d:", highpass(-60,0,0,0,1));
-//	printf("*\n");
-
 	mem.index[2] += 1;
-}
-
-void mainderivative() {
+	// DERIVATIVE FILTER
 	mem.derivativemem = derivative(mem.hpmem[getIndex(5, mem.index[2], 0)],
 								   mem.hpmem[getIndex(5, mem.index[2], -1)],
 								   mem.hpmem[getIndex(5, mem.index[2], -3)],
 								   mem.hpmem[getIndex(5, mem.index[2], -4)]);
-}
-
-void mainsquarred() {
+	// SQUARING FILTER
 	mem.squarredmem[getIndex(30, mem.index[3]-first, 1)] = squarring(mem.derivativemem);
 	mem.index[3] += 1-first;
-}
-
-void mainmwi() {
+	// MOVING WINDOW INTEGRATION FILTER
 	mem.mwimem[getIndex(3, mem.index[4]-first, 1)] = mwi(mem.squarredmem, 30);
-//	printf("%d ", mem.mwimem[getIndex(3, mem.index[4]-first, 1)]);
 	mem.index[4] += 1-first;
+	return 0;
 }
 
 void normalRPeakFound(){
@@ -174,7 +172,7 @@ void peaksbullshit(int i, int recursive) {
 		}
 
 		if(recursive == 1){
-			printf("%d < %d < %d", ,peakmem.THRESHOLD1);
+//			printf("%d < %d < %d", ,peakmem.THRESHOLD1);
 		}
 
 		if (peakmem.peaks[mem.index[5]-1] > peakmem.THRESHOLD1 && bool /*&& peakmem.peaks[mem.index[5]-1] > 3500*/) {
@@ -221,9 +219,9 @@ void printBullshit(int TIME, int PULSE, int type, int i) {
 	char lmsg[] = "LOG";
 	int bool = 0;
 	if(bool){
-		printf("\n===================================================================\n");
+		printf("\n====================================================================================\n");
 		printf("[%s] LAST RPEAK DETECTECTED: VALUE: %d TIME: %.4g PULSE: %d sysTime: %f\n", type > 0 ? wmsg : lmsg, peakmem.rpeaks[mem.index[6]-1], TIME*0.005, 60*200/peakmem.RR_AVERAGE1, i*0.005);
-		printf("===================================================================\n");
+		printf("====================================================================================\n");
 	}
 }
 
@@ -237,23 +235,25 @@ int main() {
 
 	int i = 0;
 
-	int iterations = 5000;
+	int iterations = 1;
 
 	int j = 1;
 
 	//for (; j < 101; j++){
-
+	
 	for (i = 0; i < iterations*j; i++) {
 		maininput();
-		mainlowpass();
-		mainhighpass();
-		mainderivative();
-		mainsquarred();
-		mainmwi();
+		int kk = 0;
+		startTimeAnalysis();
+		for (; kk < 1000; kk++) {	
+//			printf("asfk");
+		}
+		stopTimeAnalysis();
+		filters();
+		
 
 //		printf("%d: ", (i+1));
 //		printf("%d:    Low-Pass = %i, High-Pass = %i, Derivative = %i, Squarred = %i, MWI = %i\n", (i+1), mem.lpmem[mem.index[1]], mem.hpmem[mem.index[2]], mem.derivativemem, mem.squarredmem[mem.index[3]], mem.mwimem[mem.index[4]]);
-
 		peaksbullshit(i-1, 0);
 //		printf("%d ", peakmem.THRESHOLD2);
 //		printf("%d ", peakmem.THRESHOLD2);
@@ -265,7 +265,7 @@ int main() {
 		first = 0;
 	}
 	//memPrint();
-	//printBullshit(10,5,1);
+//	printBullshit(10,5,1,400);	
 	printf("\nEt = %d To = %d Tre = %d Fire = %d Fem = %d iterations = %d rPeak = %d\n", et, to, tre, fire, fem, iterations*j-et-to-tre-fire-fem, mem.index[6]);
 	//}
 	return 0;

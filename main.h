@@ -1,11 +1,13 @@
-#ifndef MAIN_H_
-#define MAIN_H_
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "sensor.h"
 #include "filter.h"
 #include "peaks.h"
+
+#ifndef MAIN_H_
+#define MAIN_H_
 
 // Memory Structures
 struct Memory{
@@ -45,9 +47,16 @@ int et, to, tre, fire, fem;
 int bool;
 
 // Function prototypes
+int filters();
 void printBullshit(int,int,int,int);
 void memPrint();
 int getIndex(int,int,int);
 int update();
+void startTimeAnalysis();
+void stopTimeAnalysis();
+
+// Time Analysis
+clock_t start, end;
+double cpu_time_used;
 
 #endif

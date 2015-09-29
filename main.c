@@ -26,14 +26,14 @@ void memPrint(){
 //	for(i = 0; i<5; i++) {
 //		printf("%d ", mem.hpmem[i]);
 //	}
-	for(; i < 208; i++) {
-		if(peakmem.peaks[i] == 0){
-			break;
-		}
-			printf("%d ", peakmem.peaks[i]);
-		}
-	i = 0;
-	printf("\n");
+//	for(; i < 208; i++) {
+//		if(peakmem.peaks[i] == 0){
+//			break;
+//		}
+//			printf("%d ", peakmem.peaks[i]);
+//		}
+//	i = 0;
+//	printf("\n");
 	for(; i < 100; i++) {
 		if(peakmem.rpeaks[i] == 0){
 			break;
@@ -194,6 +194,7 @@ void peaksbullshit(int i, int recursive) {
 				peakmem.RR_WARNING_COUNTER = 0;
 				to++;
 				normalRPeakFound();
+				//printf("%d ", i);
 //				printBullshit(peakmem.RR_COUNTER, peakmem.rpeaks[mem.index[6]-1], 0, i);
 				TIME = peakmem.RR_COUNTER;
 				PEAK = peakmem.rpeaks[mem.index[6]-1];
@@ -209,6 +210,7 @@ void peaksbullshit(int i, int recursive) {
 					j++;
 				}
 				afterSearchBack(j);
+				//printf("%d ", i-j);
 				peakmem.RR_WARNING_COUNTER++;
 				if(peakmem.RR_WARNING_COUNTER >= 5){
 					TYPE = 1;
@@ -239,7 +241,7 @@ void peaksbullshit(int i, int recursive) {
 }
 
 void printBullshit(int TIME, int PEAK, int TYPE, int i) {
-	int bool = 1;
+	int bool = 0;
 	if(bool){
 		printf("\n====================================================================================\n");
 		if(TYPE == 0){
@@ -295,7 +297,7 @@ int main() {
 
 	stopTimeAnalysis();
 
-	//memPrint();
+//	memPrint();
 //	printBullshit(10,5,1,400);	
 	printf("\nEt = %d To = %d Tre = %d Fire = %d Fem = %d iterations = %d rPeak = %d\n", et, to, tre, fire, fem, iterations*j-et-to-tre-fire-fem, mem.index[6]);
 	//}

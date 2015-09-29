@@ -4,11 +4,10 @@ void startTimeAnalysis() {
 	start = clock();
 }
 
-double stopTimeAnalysis() {
+void stopTimeAnalysis() {
 	end = clock();
 	cpu_time_used = 1000.0*(end-start)/CLOCKS_PER_SEC;
-//	printf("%.5lf\n", cpu_time_used);
-	return cpu_time_used;
+	printf("%.5lf\n", cpu_time_used);
 }
 
 void memPrint(){
@@ -252,24 +251,17 @@ int main() {
 	
 	int i = 0;
 	const int iterations = 10000;
-	double timestamps[iterations];
+
+	startTimeAnalysis();
 
 	for (i = 0; i < iterations; i++) {
-		startTimeAnalysis();
 		ecgScanner();
-		timestamps[i] = stopTimeAnalysis();	
 		filters();
 		peaksbullshit(i-1, 0);
 		update();
 		first = 0;
 	}
-
-	double res = 0.0;
-	int j;
-	for (; j < iterations; j++) {
-		res += timestamps[j];
-	}
-	printf("%f\n", res/iterations);
+	stopTimeAnalysis();
 	
 	printf("\nEt = %d To = %d Tre = %d Fire = %d Fem = %d iterations = %d rPeak = %d\n", et, to, tre, fire, fem, iterations-et-to-tre-fire-fem, mem.index[6]);
 	return 0;

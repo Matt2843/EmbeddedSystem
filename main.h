@@ -54,7 +54,7 @@ void memPrint();
 int getIndex(int,int,int);
 int update();
 void startTimeAnalysis();
-double stopTimeAnalysis();
+void stopTimeAnalysis();
 
 // Time Analysis
 clock_t start, end;

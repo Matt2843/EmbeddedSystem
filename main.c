@@ -9,7 +9,7 @@ void startTimeAnalysis() {
 
 void stopTimeAnalysis() {
 	end = clock();
-	cpu_time_used = ((double)end)-start/CLOCKS_PER_SEC;
+	cpu_time_used = (end-start)/CLOCKS_PER_SEC;
 	printf("%.5lf\n", cpu_time_used);
 }
 
@@ -157,6 +157,9 @@ void afterSearchBack(int j){
 
 
 void peaksbullshit(int i, int recursive) {
+	int TIME, PULSE, type;
+
+
 	if(recursive == 0){
 		peakmem.peaks[mem.index[5]] = findPeak(mem.mwimem[getIndex(3, mem.index[4], -2)], mem.mwimem[getIndex(3, mem.index[4], -1)], mem.mwimem[getIndex(3, mem.index[4], 0)]);
 		peakmem.RR_COUNTER++;
@@ -177,7 +180,7 @@ void peaksbullshit(int i, int recursive) {
 
 		if (peakmem.peaks[mem.index[5]-1] > peakmem.THRESHOLD1 && bool /*&& peakmem.peaks[mem.index[5]-1] > 3500*/) {
 			if(peakmem.peaks[mem.index[5]-1] < 2000) {
-				printBullshit()
+				//printBullshit()
 			}
 			et++;
 			if(recursive == 1){
@@ -258,7 +261,7 @@ int main() {
 // 		for (; kk < 1000; kk++) {	
 // //			printf("asfk");
 // 		}
-// 		stopTimeAnalysis();
+ 		stopTimeAnalysis();
 		filters();
 		
 

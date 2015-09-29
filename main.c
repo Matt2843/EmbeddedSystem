@@ -121,12 +121,12 @@ int filters() {
 void normalRPeakFound(){
 	peakmem.rpeaks[mem.index[6]] = peakmem.peaks[mem.index[5]-1];
 	peakmem.SPKF = evaluateSPKF(peakmem.peaks[mem.index[5]-1], peakmem.SPKF);
-//	if(peakmem.RR_COUNTER > 50){
+	if(peakmem.RR_COUNTER > 50){
 		peakmem.RecentRR_OK[getIndex(8, mem.index[7], 1)] = peakmem.RR_COUNTER;
 		mem.index[7]++;
-//	}
 		peakmem.RecentRR[getIndex(8, mem.index[8], 1)] = peakmem.RR_COUNTER;
-	mem.index[8]++;
+		mem.index[8]++;
+	}
 	peakmem.RR_AVERAGE2 = RR_AVERAGE(peakmem.RecentRR_OK);
 	peakmem.RR_AVERAGE1 = RR_AVERAGE(peakmem.RecentRR);
 	peakmem.RR_LOW = RR_LOW(peakmem.RR_AVERAGE2);
@@ -242,13 +242,14 @@ void printBullshit(int TIME, int PEAK, int TYPE, int i) {
 	int bool = 1;
 	if(bool){
 		printf("\n====================================================================================\n");
-		if(TYPE == 1){
-			printf("[WARNING] UNREGULAR HEART RYTHEM: VALUE: %d TIME: %.3lf PULSE: %d sysTime: %f", PEAK, TIME*0.005, 60*200/peakmem.RR_AVERAGE1, i*0.005);
+		if(TYPE == 0){
+			printf("    [LOG]  LAST RPEAK DETECTECTED:");
+		} else if(TYPE == 1) {
+			printf("[WARNING] UNREGULAR  HEART  RYTHM:");
 		} else if(TYPE == 2) {
-			printf("[WARNING] R-PEAK VALUE BELOW 2000: VALUE: %d TIME: %.3lf PULSE: %d sysTime: %f", PEAK, TIME*0.005, 60*200/peakmem.RR_AVERAGE1, i*0.005);
-		} else {
-			printf("[LOG] LAST RPEAK DETECTECTED: VALUE: %d TIME: %.3lf PULSE: %d sysTime: %f", PEAK, TIME*0.005, 60*200/peakmem.RR_AVERAGE1, i*0.005);
+			printf("[WARNING] R-PEAK VALUE BELOW 2000:");
 		}
+		printf(" VALUE: %d TIME: %.3lf PULSE: %d sysTime: %f", PEAK, TIME*0.005, 60*200/peakmem.RR_AVERAGE1, i*0.005);
 		printf("\n====================================================================================\n");
 	}
 }

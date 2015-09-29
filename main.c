@@ -1,16 +1,14 @@
 #include "main.h"
 
-// 31 normal peaks in the first 5000 samples
-// 50 shallow fast peaks in the last 5000 samples
-
 void startTimeAnalysis() {
 	start = clock();
 }
 
-void stopTimeAnalysis() {
+double stopTimeAnalysis() {
 	end = clock();
 	cpu_time_used = 1000.0*(end-start)/CLOCKS_PER_SEC;
-	printf("%.5lf\n", cpu_time_used);
+//	printf("%.5lf\n", cpu_time_used);
+	return cpu_time_used;
 }
 
 void memPrint(){
@@ -140,11 +138,10 @@ void normalRPeakFound(){
 void afterSearchBack(int j){
 	peakmem.rpeaks[mem.index[6]] = peakmem.peaks[mem.index[5]-j];
 	peakmem.SPKF = evaluateSPKF2(peakmem.rpeaks[mem.index[6]], peakmem.SPKF);
-	//if(peakmem.RR_COUNTER-j > 50){
+	if(peakmem.RR_COUNTER-j > 50){
 		peakmem.RecentRR[getIndex(8, mem.index[8], 1)] = peakmem.RR_COUNTER-j;
 		mem.index[8]++;
-
-	//}
+	}
 	peakmem.RR_AVERAGE1 = RR_AVERAGE(peakmem.RecentRR);
 	peakmem.RR_LOW = RR_LOW(peakmem.RR_AVERAGE1);
 	peakmem.RR_HIGH = RR_HIGH(peakmem.RR_AVERAGE1);
@@ -158,13 +155,11 @@ void afterSearchBack(int j){
 
 void peaksbullshit(int i, int recursive) {
 	int TIME, PEAK, TYPE = 0, prbool = 0;
-
-
+	
 	if(recursive == 0){
 		peakmem.peaks[mem.index[5]] = findPeak(mem.mwimem[getIndex(3, mem.index[4], -2)], mem.mwimem[getIndex(3, mem.index[4], -1)], mem.mwimem[getIndex(3, mem.index[4], 0)]);
 		peakmem.RR_COUNTER++;
 	}
-
 	if(mem.mwimem[getIndex(3, mem.index[4], -1)] < peakmem.THRESHOLD1){
 		bool = 1;
 	}
@@ -173,11 +168,6 @@ void peaksbullshit(int i, int recursive) {
 		if(recursive == 0){
 			mem.index[5]++;
 		}
-
-		if(recursive == 1){
-//			printf("%d < %d < %d", ,peakmem.THRESHOLD1);
-		}
-
 		if (peakmem.peaks[mem.index[5]-1] > peakmem.THRESHOLD1 && bool /*&& peakmem.peaks[mem.index[5]-1] > 3500*/) {
 			if(peakmem.peaks[mem.index[5]-1] < 2000) {
 				TIME = peakmem.RR_COUNTER;
@@ -195,11 +185,9 @@ void peaksbullshit(int i, int recursive) {
 				to++;
 				normalRPeakFound();
 				//printf("%d ", i);
-//				printBullshit(peakmem.RR_COUNTER, peakmem.rpeaks[mem.index[6]-1], 0, i);
 				TIME = peakmem.RR_COUNTER;
 				PEAK = peakmem.rpeaks[mem.index[6]-1];
 				prbool = 1;
-
 				peakmem.RR_COUNTER = 0;
 				bool = 0;
 			} else if (peakmem.RR_COUNTER > peakmem.RR_MISS) {
@@ -219,7 +207,6 @@ void peaksbullshit(int i, int recursive) {
 				PEAK = peakmem.rpeaks[mem.index[6]-1];
 				prbool = 1;
 				peakmem.RR_COUNTER = j;
-				//mem.index[5]--;
 				peaksbullshit(i, 1);
 				peakmem.RR_COUNTER = 0;
 				bool = 0;
@@ -262,44 +249,28 @@ int main() {
 	peakmem.THRESHOLD1 = 1000; peakmem.THRESHOLD2 = 500; peakmem.RR_LOW = 100; peakmem.RR_HIGH = 200;
 	et = 0; to = 0; tre = 0; fire = 0; fem = 0; mem.index[7] = -1; mem.index[8] = -1;
 
-//	printf("RR_LOW < RR < RR_HIGH\n");
-
-	int i = 0;
-
-	int iterations = 10000;
-
-	int j = 1;
-
-	//for (; j < 101; j++){
 	
-	startTimeAnalysis();
+	int i = 0;
+	const int iterations = 10000;
+	double timestamps[iterations];
 
-	for (i = 0; i < iterations*j; i++) {
+	for (i = 0; i < iterations; i++) {
+		startTimeAnalysis();
 		ecgScanner();
-
+		timestamps[i] = stopTimeAnalysis();	
 		filters();
-		
-
-//		printf("%d: ", (i+1));
-//		printf("%d:    Low-Pass = %i, High-Pass = %i, Derivative = %i, Squarred = %i, MWI = %i\n", (i+1), mem.lpmem[mem.index[1]], mem.hpmem[mem.index[2]], mem.derivativemem, mem.squarredmem[mem.index[3]], mem.mwimem[mem.index[4]]);
 		peaksbullshit(i-1, 0);
-//		printf("%d ", peakmem.THRESHOLD2);
-//		printf("%d ", peakmem.THRESHOLD2);
-
-
-
 		update();
-
-//		printf("%d: %d\n", i, peakmem.rpeaks[mem.index[6]-1]);
-
 		first = 0;
 	}
 
-	stopTimeAnalysis();
-
-//	memPrint();
-//	printBullshit(10,5,1,400);	
-	printf("\nEt = %d To = %d Tre = %d Fire = %d Fem = %d iterations = %d rPeak = %d\n", et, to, tre, fire, fem, iterations*j-et-to-tre-fire-fem, mem.index[6]);
-	//}
+	double res = 0.0;
+	int j;
+	for (; j < iterations; j++) {
+		res += timestamps[j];
+	}
+	printf("%f\n", res/iterations);
+	
+	printf("\nEt = %d To = %d Tre = %d Fire = %d Fem = %d iterations = %d rPeak = %d\n", et, to, tre, fire, fem, iterations-et-to-tre-fire-fem, mem.index[6]);
 	return 0;
 }

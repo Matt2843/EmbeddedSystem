@@ -1,10 +1,3 @@
-/*
- * peaks.h
- *
- *  Created on: 20/09/2015
- *      Author: Mathias
- */
-
 #ifndef PEAKS_H_
 #define PEAKS_H_
 

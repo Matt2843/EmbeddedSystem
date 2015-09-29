@@ -1,3 +1,6 @@
+/*Authors: Mathias, Lise & Albert 
+29/9/2015
+*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -49,7 +52,7 @@ int bool;
 
 // Function prototypes
 int filters();
-void printBullshit(int,int,int,int);
+void print(int,int,int,int);
 void memPrint();
 int getIndex(int,int,int);
 int update();

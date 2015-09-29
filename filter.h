@@ -1,3 +1,6 @@
+/*Authors: Mathias, Lise & Albert 
+29/9/2015
+*/
 #ifndef FILTER_H_
 #define FILTER_H_
 

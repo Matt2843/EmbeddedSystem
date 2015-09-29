@@ -1,5 +1,7 @@
+/*Authors: Mathias, Lise & Albert 
+29/9/2015
+*/
 #include <stdio.h>
-
 #ifndef SENSOR_H_
 #define SENSOR_H_
 

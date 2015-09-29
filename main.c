@@ -1,3 +1,6 @@
+/*Authors: Mathias, Lise & Albert 
+29/9/2015
+*/
 #include "main.h"
 
 void startTimeAnalysis() {
@@ -10,36 +13,7 @@ void stopTimeAnalysis() {
 	printf("%.5lf\n", cpu_time_used);
 }
 
-void memPrint(){
-	int i = 0;
-//	for(; i<13; i++){
-//		printf("%d ", mem.input[i]);
-//	}
-//	printf("\n    ");
-//	for(i = 0; i<33; i++){
-//		printf("%d ", mem.lpmem[i]);
-//	}
-//	printf("\n    ");
-//	for(i = 0; i<5; i++) {
-//		printf("%d ", mem.hpmem[i]);
-//	}
-//	for(; i < 208; i++) {
-//		if(peakmem.peaks[i] == 0){
-//			break;
-//		}
-//			printf("%d ", peakmem.peaks[i]);
-//		}
-//	i = 0;
-//	printf("\n");
-	for(; i < 100; i++) {
-		if(peakmem.rpeaks[i] == 0){
-			break;
-		}
-		printf("%d ", peakmem.rpeaks[i]);
-	}
-		//printf("\n \n");
-}
-
+// The getIndex function is used to identify the correct index for each data set.
 int getIndex(int length, int index, int delta) {
 	if(index + delta == length){
 		update();
@@ -55,6 +29,7 @@ int getIndex(int length, int index, int delta) {
 	}
 }
 
+// The update function is used to keep track of the index limits.
 int update(){
 	if(mem.index[0] >= 13){
 		mem.index[0] = 0;
@@ -80,11 +55,15 @@ int update(){
 	return 0;
 }
 
-void ecgScanner() {
+// The ecgScanner function uses sensor.h's getNextData() function to retrieve a data point.
+void ecg_scanner() {
 	mem.input[getIndex(13, mem.index[0]-first, 1)] = getNextData(file, data);
 	mem.index[0] += 1-first;
 }
 
+/*The filters function uses filter.h's lowpass(), highpass(), derivative(), squarring() and mwi() functions on the
+ *data loaded from the ecgScanner() function. 
+**/
 int filters() {
 	// LOW-PASS FILTER
 	mem.lpmem[getIndex(33, mem.index[1]-first, 1)] = lowpass(mem.input[getIndex(13, mem.index[0], 0)],
@@ -115,6 +94,7 @@ int filters() {
 	return 0;
 }
 
+// The normal RPeakFound() function is activated in the QRS function.
 void normalRPeakFound(){
 	peakmem.rpeaks[mem.index[6]] = peakmem.peaks[mem.index[5]-1];
 	peakmem.SPKF = evaluateSPKF(peakmem.peaks[mem.index[5]-1], peakmem.SPKF);
@@ -134,6 +114,7 @@ void normalRPeakFound(){
 	mem.index[6]++;
 }
 
+// The afterSearchBack() function updates the global variables according to the QRS algorithm flow-chart.
 void afterSearchBack(int j){
 	peakmem.rpeaks[mem.index[6]] = peakmem.peaks[mem.index[5]-j];
 	peakmem.SPKF = evaluateSPKF2(peakmem.rpeaks[mem.index[6]], peakmem.SPKF);
@@ -151,8 +132,8 @@ void afterSearchBack(int j){
 
 }
 
-
-void peaksbullshit(int i, int recursive) {
+// The implementation of the QRS flow-chart. Searchers for RPeaks.
+void qrs(int i, int recursive) {
 	int TIME, PEAK, TYPE = 0, prbool = 0;
 	
 	if(recursive == 0){
@@ -167,7 +148,7 @@ void peaksbullshit(int i, int recursive) {
 		if(recursive == 0){
 			mem.index[5]++;
 		}
-		if (peakmem.peaks[mem.index[5]-1] > peakmem.THRESHOLD1 && bool /*&& peakmem.peaks[mem.index[5]-1] > 3500*/) {
+		if (peakmem.peaks[mem.index[5]-1] > peakmem.THRESHOLD1 && bool) {
 			if(peakmem.peaks[mem.index[5]-1] < 2000) {
 				TIME = peakmem.RR_COUNTER;
 				PEAK = peakmem.rpeaks[mem.index[6]-1];
@@ -183,7 +164,6 @@ void peaksbullshit(int i, int recursive) {
 				peakmem.RR_WARNING_COUNTER = 0;
 				to++;
 				normalRPeakFound();
-				//printf("%d ", i);
 				TIME = peakmem.RR_COUNTER;
 				PEAK = peakmem.rpeaks[mem.index[6]-1];
 				prbool = 1;
@@ -192,12 +172,10 @@ void peaksbullshit(int i, int recursive) {
 			} else if (peakmem.RR_COUNTER > peakmem.RR_MISS) {
 				tre++;
 				int j = 2;
-				//printf("%f\n", i*0.005);
 				while(peakmem.peaks[mem.index[5] - j] <= peakmem.THRESHOLD2){
 					j++;
 				}
 				afterSearchBack(j);
-				//printf("%d ", i-j);
 				peakmem.RR_WARNING_COUNTER++;
 				if(peakmem.RR_WARNING_COUNTER >= 5){
 					TYPE = 1;
@@ -206,7 +184,7 @@ void peaksbullshit(int i, int recursive) {
 				PEAK = peakmem.rpeaks[mem.index[6]-1];
 				prbool = 1;
 				peakmem.RR_COUNTER = j;
-				peaksbullshit(i, 1);
+				qrs(i, 1);
 				peakmem.RR_COUNTER = 0;
 				bool = 0;
 				
@@ -222,26 +200,25 @@ void peaksbullshit(int i, int recursive) {
 	} else {
 	}
 	if(prbool){
-		printBullshit(TIME, PEAK, TYPE, i);
+		print(TIME, PEAK, TYPE, i);
 	}
 }
 
-void printBullshit(int TIME, int PEAK, int TYPE, int i) {
-	int bool = 0;
-	if(bool){
-		printf("\n====================================================================================\n");
-		if(TYPE == 0){
-			printf("    [LOG]  LAST RPEAK DETECTECTED:");
-		} else if(TYPE == 1) {
-			printf("[WARNING] UNREGULAR  HEART  RYTHM:");
-		} else if(TYPE == 2) {
-			printf("[WARNING] R-PEAK VALUE BELOW 2000:");
-		}
-		printf(" VALUE: %d TIME: %.3lf PULSE: %d sysTime: %f", PEAK, TIME*0.005, 60*200/peakmem.RR_AVERAGE1, i*0.005);
-		printf("\n====================================================================================\n");
+// The User Interface.
+void print(int TIME, int PEAK, int TYPE, int i) {
+	printf("\n====================================================================================\n");
+	if(TYPE == 0){
+		printf("    [LOG]  LAST RPEAK DETECTECTED:");
+	} else if(TYPE == 1) {
+		printf("[WARNING] UNREGULAR  HEART  RYTHM:");
+	} else if(TYPE == 2) {
+		printf("[WARNING] R-PEAK VALUE BELOW 2000:");
 	}
+	printf(" VALUE: %d TIME: %.3lf PULSE: %d sysTime: %f", PEAK, TIME*0.005, 60*200/peakmem.RR_AVERAGE1, i*0.005);
+	printf("\n====================================================================================\n");
 }
 
+// The program driver.
 int main() {
 	file = fopen(filename, "r");
 	first = 1; peakmem.SPKF = 500; peakmem.NPKF = 500; peakmem.RR_COUNTER = 0;
@@ -253,11 +230,10 @@ int main() {
 	const int iterations = 10000;
 
 	startTimeAnalysis();
-
 	for (i = 0; i < iterations; i++) {
-		ecgScanner();
+		ecg_scanner();
 		filters();
-		peaksbullshit(i-1, 0);
+		qrs(i-1, 0);
 		update();
 		first = 0;
 	}
